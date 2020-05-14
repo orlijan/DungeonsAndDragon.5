@@ -12,6 +12,9 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
+import java.math.*;
+
+import androidx.constraintlayout.solver.widgets.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +27,13 @@ public class GameView extends SurfaceView implements Runnable {
     private int screenX, screenY, score = 0;
     public static float screenRatioX, screenRatioY;
     private Paint paint;
-    private Bird[] birds;
+    private enemy[] enemys;
     private SharedPreferences prefs;
     private Random random;
     private SoundPool soundPool;
     private List<Bullet> bullets;
     private int sound;
-    private Flight flight;
+    private tower tower;
     private GameActivity activity;
     private Background background1, background2;
 
@@ -66,7 +69,7 @@ public class GameView extends SurfaceView implements Runnable {
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
 
-        flight = new Flight(this, screenY, getResources());
+        tower = new tower(this, screenY, getResources());
 
         bullets = new ArrayList<>();
 
@@ -76,12 +79,12 @@ public class GameView extends SurfaceView implements Runnable {
         paint.setTextSize(128);
         paint.setColor(Color.WHITE);
 
-        birds = new Bird[4];
+        enemys = new enemy[4];
 
         for (int i = 0;i < 4;i++) {
 
-            Bird bird = new Bird(getResources());
-            birds[i] = bird;
+            enemy enemy = new enemy(getResources());
+            enemys[i] = enemy;
 
         }
 
@@ -115,16 +118,16 @@ public class GameView extends SurfaceView implements Runnable {
             background2.x = screenX;
         }*/
 /*
-        if (flight.isGoingUp)
-            flight.y -= 30 * screenRatioY;
+        if (tower.isGoingUp)
+            tower.y -= 30 * screenRatioY;
         else
-            flight.y += 30 * screenRatioY;
+            tower.y += 30 * screenRatioY;
 
-        if (flight.y < 0)
-            flight.y = 0;
+        if (tower.y < 0)
+            tower.y = 0;
 
-        if (flight.y >= screenY - flight.height)
-            flight.y = screenY - flight.height;
+        if (tower.y >= screenY - tower.height)
+            tower.y = screenY - tower.height;
 
  */
 
@@ -136,66 +139,76 @@ public class GameView extends SurfaceView implements Runnable {
 
 
         List<Bullet> trash = new ArrayList<>();
-        newBullet();
-        for (Bullet bullet : bullets) {
 
-            if (bullet.x > screenX)
-                trash.add(bullet);
+        for (enemy enemy : enemys) {
 
-            bullet.y += 50 * screenRatioY;
+            enemy.x -= enemy.speed;
 
-            for (Bird bird : birds) {
+            if (enemy.x + enemy.width < 0) {
 
-                if (Rect.intersects(bird.getCollisionShape(),
-                        bullet.getCollisionShape())) {
 
-                    score++;
-                    bird.x = -500;
-                    bullet.x = screenX + 500;
-                    bird.wasShot = true;
-
-                }
-
-            }
-
-        }
-
-        for (Bullet bullet : trash)
-            bullets.remove(bullet);
-
-        for (Bird bird : birds) {
-
-            bird.x -= bird.speed;
-
-            if (bird.x + bird.width < 0) {
-
-                if (!bird.wasShot) {
-                    score-- ;
+                if (!enemy.wasShot) {
+                    score--;
                     isGameOver = true;
                     return;
                 }
 
                 int bound = (int) (10 * screenRatioX);
-                bird.speed = random.nextInt(bound);
+                enemy.speed = random.nextInt(bound);
 
-                if (bird.speed < 10 * screenRatioX)
-                    bird.speed = (int) (10 * screenRatioX);
+                if (enemy.speed < 10 * screenRatioX)
+                    enemy.speed = (int) (10 * screenRatioX);
 
-                bird.x = screenX;
-                //bird.y = random.nextInt(screenY - bird.height);
-                bird.y = (screenY/2)-bird.height;
-                bird.wasShot = false;
+                enemy.x = screenX;
+                //enemy.y = random.nextInt(screenY - enemy.height);
+                enemy.y = (screenY / 2) - enemy.height;
+                enemy.wasShot = false;
+
             }
 
-            if (Rect.intersects(bird.getCollisionShape(), flight.getCollisionShape())) {
 
-                isGameOver = true;
+            if (Rect.intersects(enemy.getCollisionShape(), tower.getCollisionShape())) {
+                newBullet();
+                for (Bullet bullet : bullets) {
+
+                    if (bullet.x < screenX)
+                        trash.add(bullet);
+
+                    bullet.y =  ( (bullet.y+enemy.y/10)  );
+                    bullet.x = ( (bullet.x+enemy.y/10) );
+                    //bullet.y =  ( (bullet.y+5+random.nextInt())*(int)screenRatioY  );
+                    //bullet.x = ( (bullet.x+5+random.nextInt())*(int)screenRatioX );
+
+                        if (Rect.intersects(enemy.getCollisionShape(),
+                                bullet.getCollisionShape())) {
+
+                            score++;
+                            enemy.x = -500;
+                            bullet.x = screenX + 500;
+
+
+                            enemy.wasShot = true;
+                            score++;
+                            trash.add(bullet);
+                        }
+
+
+
+                }
+
                 return;
             }
 
+
+        }
+        for (Bullet bullet : trash)
+        {
+            bullets.remove(bullet);
         }
 
     }
+
+
 
     private void draw () {
 
@@ -205,25 +218,26 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
             canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
 
-            for (Bird bird : birds)
-                canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
+            for (enemy enemy : enemys)
+                canvas.drawBitmap(enemy.getenemy(), enemy.x, enemy.y, paint);
 
             canvas.drawText(score + "", screenX / 2f, 164, paint);
 
             if (isGameOver) {
                 isPlaying = false;
-                canvas.drawBitmap(flight.getDead(), flight.x, flight.y, paint);
+                canvas.drawBitmap(tower.getDead(), tower.x, tower.y, paint);
                 getHolder().unlockCanvasAndPost(canvas);
                 saveIfHighScore();
                 waitBeforeExiting ();
                 return;
             }
 
-            canvas.drawBitmap(flight.getFlight(), flight.x, flight.y, paint);
+                canvas.drawBitmap(tower.gettower(), tower.x, tower.y, paint);
 
-            for (Bullet bullet : bullets)
+
+            for (Bullet bullet : bullets) {
                 canvas.drawBitmap(bullet.bullet, bullet.x, bullet.y, paint);
-
+            }
             getHolder().unlockCanvasAndPost(canvas);
 
         }
@@ -231,9 +245,8 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void waitBeforeExiting() {
-
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
             activity.startActivity(new Intent(activity, MainActivity.class));
             activity.finish();
         } catch (InterruptedException e) {
@@ -278,35 +291,17 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
     }
-/*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (event.getX() < screenX / 2) {
-                    flight.isGoingUp = true;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                flight.isGoingUp = false;
-                if (event.getX() > screenX / 2)
-                    flight.toShoot++;
-                break;
-        }
-
-        return true;
-    }
-*/
 @Override
 public boolean onTouchEvent(MotionEvent event) {
 
     if((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP)
     {
         //event.getX(), event.getY();
-        flight.isGoingUp = true;
-        flight.x= (int)event.getX();
-        flight.y = (int)event.getY();
+        tower.isplaced = true;
+        tower.x= (int)event.getX();
+        tower.y = (int)event.getY();
+
 
     }
 
@@ -318,8 +313,8 @@ public boolean onTouchEvent(MotionEvent event) {
             soundPool.play(sound, 1, 1, 0, 0, 1);
 
         Bullet bullet = new Bullet(getResources());
-        bullet.x = flight.x + flight.width;
-        bullet.y = flight.y + (flight.height / 2);
+        bullet.x = tower.x + (tower.width/2);
+        bullet.y = tower.y + (tower.height / 2);
         bullets.add(bullet);
 
     }

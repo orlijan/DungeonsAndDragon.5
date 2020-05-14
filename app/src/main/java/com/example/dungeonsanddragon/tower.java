@@ -8,24 +8,24 @@ import android.graphics.Rect;
 import static com.example.dungeonsanddragon.GameView.screenRatioX;
 import static com.example.dungeonsanddragon.GameView.screenRatioY;
 
-public class Flight {
+public class tower {
 
     int toShoot = 0;
     //this checks the touch to see if the thing works
-    boolean isGoingUp = false;
+    boolean isplaced = false;
     int x, y, width, height, wingCounter = 0, shootCounter = 1;
-    Bitmap flight1, flight2, shoot1, shoot2, shoot3, shoot4, shoot5, dead;
+    Bitmap tower1, tower2, shoot1, shoot2, shoot3, shoot4, shoot5, dead;
     private GameView gameView;
 
-    Flight (GameView gameView, int screenY, Resources res) {
+    tower (GameView gameView, int screenY, Resources res) {
 
         this.gameView = gameView;
 
-        flight1 = BitmapFactory.decodeResource(res, R.drawable.fly1);
-        flight2 = BitmapFactory.decodeResource(res, R.drawable.fly2);
+        tower1 = BitmapFactory.decodeResource(res, R.drawable.tower1);
+        tower2 = BitmapFactory.decodeResource(res, R.drawable.tower2);
 
-        width = flight1.getWidth();
-        height = flight1.getHeight();
+        width = tower1.getWidth();
+        height = tower1.getHeight();
 
         width /= 4;
         height /= 4;
@@ -33,8 +33,8 @@ public class Flight {
         width = (int) (width * screenRatioX);
         height = (int) (height * screenRatioY);
 
-        flight1 = Bitmap.createScaledBitmap(flight1, width, height, false);
-        flight2 = Bitmap.createScaledBitmap(flight2, width, height, false);
+        tower1 = Bitmap.createScaledBitmap(tower1, width, height, false);
+        tower2 = Bitmap.createScaledBitmap(tower2, width, height, false);
 
         shoot1 = BitmapFactory.decodeResource(res, R.drawable.shoot1);
         shoot2 = BitmapFactory.decodeResource(res, R.drawable.shoot2);
@@ -56,7 +56,7 @@ public class Flight {
 
     }
 
-    Bitmap getFlight () {
+    Bitmap gettower () {
 
         if (toShoot != 0) {
 
@@ -89,15 +89,15 @@ public class Flight {
 
         if (wingCounter == 0) {
             wingCounter++;
-            return flight1;
+            return tower1;
         }
         wingCounter--;
 
-        return flight2;
+        return tower2;
     }
 
     Rect getCollisionShape () {
-        return new Rect(x, y, x + width, y + height);
+        return new Rect(x-300, y-300, x + width+300, y + height+300);
     }
 
     Bitmap getDead () {
