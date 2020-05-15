@@ -14,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import java.math.*;
 
-import androidx.constraintlayout.solver.widgets.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +35,6 @@ public class GameView extends SurfaceView implements Runnable {
     private tower tower;
     private GameActivity activity;
     private Background background1;
-            //background2;
-
 
     public GameView(GameActivity activity, int screenX, int screenY) {
         super(activity);
@@ -69,13 +66,12 @@ public class GameView extends SurfaceView implements Runnable {
         screenRatioY = 1080f / screenY;
 
         background1 = new Background(screenX, screenY, getResources());
-       // background2 = new Background(screenX, screenY, getResources());
 
         tower = new tower(this, screenY, getResources());
 
         bullets = new ArrayList<>();
 
-       // background2.x = screenX;
+
 
         paint = new Paint();
         paint.setTextSize(128);
