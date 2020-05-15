@@ -11,9 +11,7 @@ import static com.example.dungeonsanddragon.GameView.screenRatioY;
 public class tower {
 
     int toShoot = 0;
-    //this checks the touch to see if the thing works
-    boolean isplaced = false;
-    int x, y, width, height, wingCounter = 0, shootCounter = 1;
+    int x, y, width, height,  shootCounter = 1;
     Bitmap tower1, tower2, shoot1, shoot2, shoot3, shoot4, shoot5, dead;
     private GameView gameView;
 
@@ -86,13 +84,6 @@ public class tower {
 
             return shoot5;
         }
-
-        if (wingCounter == 0) {
-            wingCounter++;
-            return tower1;
-        }
-        wingCounter--;
-
         return tower2;
     }
 

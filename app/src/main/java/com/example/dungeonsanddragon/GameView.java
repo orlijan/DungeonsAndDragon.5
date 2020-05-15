@@ -35,7 +35,9 @@ public class GameView extends SurfaceView implements Runnable {
     private int sound;
     private tower tower;
     private GameActivity activity;
-    private Background background1, background2;
+    private Background background1;
+            //background2;
+
 
     public GameView(GameActivity activity, int screenX, int screenY) {
         super(activity);
@@ -67,21 +69,21 @@ public class GameView extends SurfaceView implements Runnable {
         screenRatioY = 1080f / screenY;
 
         background1 = new Background(screenX, screenY, getResources());
-        background2 = new Background(screenX, screenY, getResources());
+       // background2 = new Background(screenX, screenY, getResources());
 
         tower = new tower(this, screenY, getResources());
 
         bullets = new ArrayList<>();
 
-        background2.x = screenX;
+       // background2.x = screenX;
 
         paint = new Paint();
         paint.setTextSize(128);
         paint.setColor(Color.WHITE);
 
-        enemys = new enemy[4];
+        enemys = new enemy[3];
 
-        for (int i = 0;i < 4;i++) {
+        for (int i = 0;i < 3;i++) {
 
             enemy enemy = new enemy(getResources());
             enemys[i] = enemy;
@@ -107,36 +109,6 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update () {
 
-        //background1.x -= 10 * screenRatioX;
-        //background2.x -= 10 * screenRatioX;
-/*
-        if (background1.x + background1.background.getWidth() < 0) {
-            background1.x = screenX;
-        }
-
-        if (background2.x + background2.background.getWidth() < 0) {
-            background2.x = screenX;
-        }*/
-/*
-        if (tower.isGoingUp)
-            tower.y -= 30 * screenRatioY;
-        else
-            tower.y += 30 * screenRatioY;
-
-        if (tower.y < 0)
-            tower.y = 0;
-
-        if (tower.y >= screenY - tower.height)
-            tower.y = screenY - tower.height;
-
- */
-
-        //if
-        /*// Convert the float screen coordinates
-        // into int grid coordinates
-        horizontalTouched = (int)touchX/ blockSize;
-        verticalTouched = (int)touchY/ blockSize;*/
-
 
         List<Bullet> trash = new ArrayList<>();
 
@@ -160,7 +132,6 @@ public class GameView extends SurfaceView implements Runnable {
                     enemy.speed = (int) (10 * screenRatioX);
 
                 enemy.x = screenX;
-                //enemy.y = random.nextInt(screenY - enemy.height);
                 enemy.y = (screenY / 2) - enemy.height;
                 enemy.wasShot = false;
 
@@ -176,8 +147,6 @@ public class GameView extends SurfaceView implements Runnable {
 
                     bullet.y =  ( (bullet.y+enemy.y/10)  );
                     bullet.x = ( (bullet.x+enemy.y/10) );
-                    //bullet.y =  ( (bullet.y+5+random.nextInt())*(int)screenRatioY  );
-                    //bullet.x = ( (bullet.x+5+random.nextInt())*(int)screenRatioX );
 
                         if (Rect.intersects(enemy.getCollisionShape(),
                                 bullet.getCollisionShape())) {
@@ -216,10 +185,12 @@ public class GameView extends SurfaceView implements Runnable {
 
             Canvas canvas = getHolder().lockCanvas();
             canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
-            canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
+            //canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
 
             for (enemy enemy : enemys)
                 canvas.drawBitmap(enemy.getenemy(), enemy.x, enemy.y, paint);
+
+
 
             canvas.drawText(score + "", screenX / 2f, 164, paint);
 
@@ -297,12 +268,8 @@ public boolean onTouchEvent(MotionEvent event) {
 
     if((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP)
     {
-        //event.getX(), event.getY();
-        tower.isplaced = true;
         tower.x= (int)event.getX();
         tower.y = (int)event.getY();
-
-
     }
 
     return true;
